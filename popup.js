@@ -19,8 +19,8 @@ const $clearEmptyBtn = document.getElementById('clearEmptyBtn');
 const $clearHistoryBtn = document.getElementById('clearHistoryBtn');
 const $historyList = document.getElementById('historyList');
 
-// Store current HKID (without brackets for display)
-let currentHKID = '';
+// Store current HKID (without brackets for display) - currently unused
+// let currentHKID = '';
 
 // Utility functions
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -60,7 +60,7 @@ const calculateCheckDigit = (charPart, numPart) => {
     checkSum += LETTER_WEIGHTS_OLD[1] * (10 + strValidChars.indexOf(charPart));
   }
 
-  for (let i = 0, j = DIGIT_WEIGHTS.length - 1; i < numPart.length; i++, j--) {
+  for (let i = 0; i < numPart.length; i++) {
     checkSum += DIGIT_WEIGHTS[i] * parseInt(numPart.charAt(i));
   }
 
@@ -113,11 +113,27 @@ const generateId = () => {
 };
 
 /**
+ * Escape HTML special characters to prevent XSS
+ * @param {string} str
+ * @returns {string}
+ */
+const escapeHtml = (str) => {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+};
+
+/**
  * Load history from Chrome storage
  */
 const loadHistory = async () => {
   return new Promise((resolve) => {
     chrome.storage.local.get(['hkidHistory'], (result) => {
+      if (chrome.runtime.lastError) {
+        console.error('Storage read error:', chrome.runtime.lastError);
+        resolve([]);
+        return;
+      }
       resolve(result.hkidHistory || []);
     });
   });
@@ -128,7 +144,12 @@ const loadHistory = async () => {
  */
 const saveHistory = async (history) => {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ hkidHistory: history }, resolve);
+    chrome.storage.local.set({ hkidHistory: history }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Storage write error:', chrome.runtime.lastError);
+      }
+      resolve();
+    });
   });
 };
 
@@ -228,9 +249,9 @@ const renderHistory = (history) => {
     };
 
     item.innerHTML = `
-      <div class="hkid" data-hkid="${record.hkid}">${record.hkidDisplay}</div>
+      <div class="hkid" data-hkid="${escapeHtml(record.hkidDisplay)}">${escapeHtml(record.hkidDisplay)}</div>
       <div class="remark-row">
-        <input type="text" class="remark-input" data-id="${record.id}" value="${record.remark || ''}" placeholder="輸入備註...">
+        <input type="text" class="remark-input" data-id="${record.id}" value="${escapeHtml(record.remark || '')}" placeholder="輸入備註...">
         <button class="btn-save" data-id="${record.id}">儲存</button>
       </div>
       <div class="meta">
@@ -244,7 +265,7 @@ const renderHistory = (history) => {
     // Click to copy
     const hkidElement = item.querySelector('.hkid');
     hkidElement.addEventListener('click', () => {
-      navigator.clipboard.writeText(record.hkid);
+      navigator.clipboard.writeText(record.hkidDisplay);
       showNotification('已複製到剪貼簿');
     });
 
@@ -368,7 +389,6 @@ const importHistory = async (file) => {
 const createNewHKID = async () => {
   try {
     const hkidData = generateHKID();
-    currentHKID = hkidData.hkidDisplay;
     $hkidDisplay.textContent = hkidData.hkidDisplay;
     $hkidDisplay.classList.add('has-value');
 
@@ -397,8 +417,9 @@ const toggleHistory = () => {
 document.addEventListener('DOMContentLoaded', () => {
   // Click on HKID to copy and generate new one
   $hkidDisplay.addEventListener('click', async () => {
-    if (currentHKID) {
-      await navigator.clipboard.writeText(currentHKID);
+    const hkidText = $hkidDisplay.textContent;
+    if (hkidText && hkidText !== '點擊生成 HKID') {
+      await navigator.clipboard.writeText(hkidText);
       showNotification('已複製到剪貼簿');
     }
     // Auto-generate new HKID
@@ -426,6 +447,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (error) {
         showNotification('匯入失敗：' + error.message);
       }
+      // Clear file input to allow re-selecting same file
+      $importFile.value = '';
     }
   });
 

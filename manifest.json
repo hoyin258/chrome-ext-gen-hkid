@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "HKID Generator",
-  "version": "1.0",
-  "description": "Generate Hong Kong Identity Card numbers with history management",
+  "version": "1.0.0",
+  "description": "Generate valid Hong Kong ID numbers with history management. Supports old/new format with checksum validation.",
+  "default_locale": "zh_TW",
   "permissions": ["storage"],
   "action": {
     "default_popup": "popup.html",
