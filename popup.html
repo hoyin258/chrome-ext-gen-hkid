@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HKID Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Generator Section -->
+    <section class="generator-section">
+      <div id="hkidDisplay" class="hkid-result" aria-label="Generated HKID"></div>
+    </section>
+
+    <!-- History Section -->
+    <section class="history-section-container">
+      <div class="history-header">
+        <h2>歷史記錄</h2>
+        <div class="header-actions">
+          <button id="exportBtn" class="btn-link">匯出</button>
+          <button id="importBtn" class="btn-link">匯入</button>
+          <input type="file" id="importFile" accept=".json" style="display: none;">
+          <button id="toggleHistoryBtn" class="btn-toggle" aria-label="Toggle history">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path id="toggleIcon" d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="historyCollapse" class="history-collapse">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="搜尋...">
+        </div>
+
+        <div class="history-actions">
+          <button id="clearEmptyBtn" class="btn-text">清空無備註</button>
+          <button id="clearHistoryBtn" class="btn-text btn-danger">清空</button>
+        </div>
+
+        <div id="historyList" class="history-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

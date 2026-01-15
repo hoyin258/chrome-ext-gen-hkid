@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Generated icons (can be regenerated)
+icons/*.png
+!icons/icon.svg
+
+# Build artifacts
+*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Package files
+package-lock.json
+
+# Temporary files
+*.tmp
+*.temp
+temp/
