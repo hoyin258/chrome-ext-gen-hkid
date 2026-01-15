@@ -39,3 +39,5 @@ package-lock.json
 *.tmp
 *.temp
 temp/
+
+/bin/*.zip
